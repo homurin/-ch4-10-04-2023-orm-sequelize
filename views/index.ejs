@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>name</th>
+                <th>price</th>
+                <th>stock</th>
+                <th>image</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% products.map((product)=>{ %>
+                <tr>
+                    <td>
+                        <%= product.name %>
+                    </td>
+                    <td>
+                        <%= product.price%>
+                    </td>
+                    <td>
+                        <%= product.stock %>
+                    </td>
+                    <td>
+                        <img src="<%= product.imageUrl %>" alt="<%= product.name %>">
+                    </td>
+                </tr>
+                <% }); %>
+        </tbody>
+    </table>
+</body>
+
+</html>

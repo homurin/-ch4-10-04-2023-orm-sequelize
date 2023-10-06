@@ -1,15 +1,27 @@
 const { Product } = require("../models");
+const imagekit = require("../libs/imageKit");
 
 const createProduct = async (req, res) => {
   const { name, price, stock } = req.body;
+  const file = req.file;
+  const split = file.originalname.split(".");
+  const extension = split[split.length - 1];
+
+  // upload to imagekit
+
   try {
     const newProduct = await Product.create({ name, price, stock });
-
+    const img = await imagekit.upload({
+      file: file.buffer,
+      fileName: `IMG-${Date.now()}.${extension}`,
+    });
     res.status(201).json({
       status: "success",
       data: newProduct,
     });
-  } catch (error) {}
+  } catch (error) {
+    res.status(400).json({ status: "failed" });
+  }
 };
 const findProducts = async (req, res) => {
   try {

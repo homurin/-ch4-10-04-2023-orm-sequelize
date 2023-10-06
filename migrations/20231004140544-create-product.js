@@ -21,6 +21,11 @@ module.exports = {
         type: Sequelize.INTEGER,
         defaultValue: 0,
       },
+      imageUrl: {
+        type: Sequelize.TEXT,
+        defaultValue:
+          "https://tse2.mm.bing.net/th?id=OIP.U2iQ7wNK6ZzTW_traW_-PQHaHa&pid=Api&P=0&h=180",
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
