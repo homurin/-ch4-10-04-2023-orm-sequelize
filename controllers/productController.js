@@ -1,7 +1,8 @@
 const { Product } = require("../models");
 const imagekit = require("../libs/imageKit");
+const ApiError = require("../utils/apiError");
 
-const createProduct = async (req, res) => {
+const createProduct = async (req, res, next) => {
   const { name, price, stock } = req.body;
   const file = req.file;
   const split = file.originalname.split(".");
@@ -20,33 +21,46 @@ const createProduct = async (req, res) => {
       data: newProduct,
     });
   } catch (error) {
-    res.status(400).json({ status: "failed" });
+    next(new ApiError(error.message, 400));
   }
 };
-const findProducts = async (req, res) => {
+
+const findProducts = async (req, res, next) => {
   try {
     const newProduct = await Product.findAll();
 
-    res.status(201).json({
+    res.status(200).json({
       status: "success",
       data: newProduct,
     });
-  } catch (error) {}
+  } catch (error) {
+    next(new ApiError(error.message, 400));
+  }
 };
 
-const findProductById = async (req, res) => {
+const findProductById = async (req, res, next) => {
   try {
     const condition = {
       where: {
         id: req.params.id,
       },
     };
-    const newProduct = await Product.findOne(condition);
+
+    const product = await Product.findOne(condition);
+
+    if (!product) {
+      next(new ApiError("Product not found", 404));
+    }
     res.status(201).json({
       status: "success",
-      data: newProduct,
+      data: product,
     });
-  } catch (error) {}
+  } catch (error) {
+    if (error.name == "SequelizeDatabaseError") {
+      return next(new ApiError(`Bad request`, 400));
+    }
+    next(new ApiError(error.message, 400));
+  }
 };
 
 const updateProduct = async (req, res) => {
@@ -58,11 +72,16 @@ const updateProduct = async (req, res) => {
       },
     };
     const newProduct = await Product.update({ name, price, stock }, condition);
+    if (!newProduct) {
+      next(new ApiError("Product not found"), 404);
+    }
     res.status(201).json({
       status: "success",
       data: newProduct,
     });
-  } catch (error) {}
+  } catch (error) {
+    next(new Error(error.message, 400));
+  }
 };
 
 const deleteProduct = async (req, res) => {
@@ -72,12 +91,17 @@ const deleteProduct = async (req, res) => {
         id: req.params.id,
       },
     };
-    const newProduct = await Product.destroy(condition);
+    const product = await Product.destroy(condition);
+    if (!product) {
+      next(new ApiError("Product not found", 404));
+    }
     res.status(201).json({
       status: "success",
-      data: newProduct,
+      data: product,
     });
-  } catch (error) {}
+  } catch (error) {
+    next(new ApiError("Internal server error", 500));
+  }
 };
 
 module.exports = {
