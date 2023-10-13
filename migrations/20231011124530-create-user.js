@@ -2,30 +2,25 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("Products", {
+    await queryInterface.createTable("Users", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-
       name: {
         type: Sequelize.STRING,
-        allowNull: false,
       },
-      price: {
-        type: Sequelize.FLOAT,
-        defaultValue: 10000,
+      role: {
+        type: Sequelize.ENUM(["Owner", "Staff"]),
+        defaultValue: "Staff",
       },
-      stock: {
+      age: {
         type: Sequelize.INTEGER,
-        defaultValue: 0,
       },
-      imageUrl: {
-        type: Sequelize.TEXT,
-        defaultValue:
-          "https://tse2.mm.bing.net/th?id=OIP.U2iQ7wNK6ZzTW_traW_-PQHaHa&pid=Api&P=0&h=180",
+      address: {
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,
@@ -38,6 +33,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("Products");
+    await queryInterface.dropTable("Users");
   },
 };

@@ -5,23 +5,38 @@ const ApiError = require("../utils/apiError");
 const createProduct = async (req, res, next) => {
   const { name, price, stock } = req.body;
   const file = req.file;
-  const split = file.originalname.split(".");
-  const extension = split[split.length - 1];
-
-  // upload to imagekit
+  let img;
 
   try {
-    const newProduct = await Product.create({ name, price, stock });
-    const img = await imagekit.upload({
-      file: file.buffer,
-      fileName: `IMG-${Date.now()}.${extension}`,
+    if (file) {
+      // dapatkan extension file nya
+      const split = file.originalname.split(".");
+      const extension = split[split.length - 1];
+
+      // upload file ke imagekit
+      const uploadedImage = await imagekit.upload({
+        file: file.buffer,
+        fileName: `IMG-${Date.now()}.${extension}`,
+      });
+      img = uploadedImage.url;
+    }
+
+    const newProduct = await Product.create({
+      name,
+      userId,
+      price,
+      stock,
+      imageUrl: img,
     });
-    res.status(201).json({
-      status: "success",
-      data: newProduct,
+
+    res.status(200).json({
+      status: "Success",
+      data: {
+        newProduct,
+      },
     });
-  } catch (error) {
-    next(new ApiError(error.message, 400));
+  } catch (err) {
+    next(new ApiError(err.message, 400));
   }
 };
 
@@ -45,21 +60,19 @@ const findProductById = async (req, res, next) => {
         id: req.params.id,
       },
     };
-
+    console.log("tes");
     const product = await Product.findOne(condition);
 
-    if (!product) {
-      next(new ApiError("Product not found", 404));
-    }
+    // if (!product) {
+    //   next(new ApiError("Product not found", 404));
+    // }
     res.status(201).json({
       status: "success",
       data: product,
     });
-  } catch (error) {
-    if (error.name == "SequelizeDatabaseError") {
-      return next(new ApiError(`Bad request`, 400));
-    }
-    next(new ApiError(error.message, 400));
+  } catch (err) {
+    console.log(err);
+    next(new ApiError(err.message, 500));
   }
 };
 
