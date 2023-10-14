@@ -9,25 +9,24 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      // Shop.hasMany(models.Shop, {
-      //   foreignKey: {
-      //     name: "userId",
-      //     allowNull: false,
-      //   },
-      // });
-      // Shop.belongsTo(models.Product, {
-      //   foreignKey: {
-      //     name: "productId",
-      //     allowNull: false,
-      //   },
-      // });
+      Shop.belongsTo(models.User, {
+        foreignKey: {
+          name: "userId",
+          allowNull: false,
+        },
+      });
+      Shop.hasMany(models.Product, {
+        foreignKey: {
+          name: "shopId",
+          allowNull: true,
+        },
+      });
     }
   }
   Shop.init(
     {
       name: DataTypes.STRING,
       userId: DataTypes.INTEGER,
-      productId: DataTypes.INTEGER,
     },
     {
       sequelize,

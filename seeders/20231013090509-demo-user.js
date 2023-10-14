@@ -1,6 +1,8 @@
 "use strict";
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
+const { User, Auth } = require("../models");
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -13,7 +15,7 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
      */
-    await queryInterface.bulkInsert("Users", [
+    const userArr = [
       {
         name: "Peter Griffin",
         age: 35,
@@ -62,57 +64,22 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-    ]);
-    queryInterface.bulkInsert("Auths", [
-      {
-        userId: 1,
-        email: "peter@gmail.com",
-        password: bcrypt.hashSync("griffin123456", saltRounds),
-        confirmPassword: bcrypt.hashSync("griffin123456", saltRounds),
+    ];
+    const users = await User.bulkCreate(userArr);
+    const auths = users.map((el) => {
+      const email = el.name.split(" ")[0] + "@gmail.com";
+      const hashedPassword = bcrypt.hashSync("griffin123456", saltRounds);
+      return {
+        userId: el.id,
+        email: email.toLowerCase(),
+        password: hashedPassword,
+        confirmPassword: hashedPassword,
         createdAt: new Date(),
         updatedAt: new Date(),
-      },
-      {
-        userId: 2,
-        email: "louis@gmail.com",
-        password: bcrypt.hashSync("griffin123456", saltRounds),
-        confirmPassword: bcrypt.hashSync("griffin123456", saltRounds),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        userId: 3,
-        email: "megatron@gmail.com",
-        password: bcrypt.hashSync("griffin123456", saltRounds),
-        confirmPassword: bcrypt.hashSync("griffin123456", saltRounds),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        userId: 4,
-        email: "chris@gmail.com",
-        password: bcrypt.hashSync("griffin123456", saltRounds),
-        confirmPassword: bcrypt.hashSync("griffin123456", saltRounds),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        userId: 5,
-        email: "stewie@gmail.com",
-        password: bcrypt.hashSync("griffin123456", saltRounds),
-        confirmPassword: bcrypt.hashSync("griffin123456", saltRounds),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        userId: 6,
-        email: "brian@gmail.com",
-        password: bcrypt.hashSync("griffin123456", saltRounds),
-        confirmPassword: bcrypt.hashSync("griffin123456", saltRounds),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ]);
+      };
+    });
+    console.log(auths);
+    queryInterface.bulkInsert("Auths", auths);
   },
 
   async down(queryInterface, Sequelize) {

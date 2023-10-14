@@ -3,8 +3,9 @@ const imagekit = require("../libs/imageKit");
 const ApiError = require("../utils/apiError");
 
 const createProduct = async (req, res, next) => {
-  const { name, price, stock } = req.body;
+  const { name, price, stock, shopId } = req.body;
   const file = req.file;
+  const userId = req.user.id;
   let img;
 
   try {
@@ -24,6 +25,7 @@ const createProduct = async (req, res, next) => {
     const newProduct = await Product.create({
       name,
       userId,
+      shopId,
       price,
       stock,
       imageUrl: img,

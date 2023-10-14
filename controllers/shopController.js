@@ -3,7 +3,7 @@ const ApiError = require("../utils/apiError");
 
 const findAllShop = async (req, res, next) => {
   try {
-    const shops = await Shop.findAll();
+    const shops = await Shop.findAll({ include: ["Products"] });
     res.status(200).json({
       status: "ok",
       data: shops,
